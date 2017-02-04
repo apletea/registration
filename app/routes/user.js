@@ -1,5 +1,9 @@
 let Model = require('../model');
 let emailNotification = require('../utils/mailer');
+let errorUtil = require('../utils/errors');
+let responseUtil = require('../utils/response');
+let authHelper = require('../utils/auth');
+
 module.exports = (express, passport) => {
 	let router = express.Router();
 
@@ -10,6 +14,7 @@ module.exports = (express, passport) => {
 	});
 
 	router.post('/register', (req,res) => {
+		console.log(req.body);
 		Model.findOne({
 			where: {
 				email: req.body.email.trim().toLowerCase()
@@ -52,6 +57,55 @@ module.exports = (express, passport) => {
 				res.status(500);
 				return res.json(err);
 			})
+	});
+
+	router.get('/login', (req,res) => {
+		let email = req.query.email;
+		let password = req.query.password;
+
+		let errorObject = errorUtil.checkRequiredParams(req,['email','password'], errorUtil.errorCodes.ERR_USER_LOGIN_FAIL);
+
+		if (errorObject) {
+			res.status(400);
+			return res.json(errorObject);
+		}
+
+		Model.findOne({where: {
+			email: email.trim().toLowerCase(),
+			is_confirm: true
+		}})
+		.then(result => {
+			if (!result){
+				res.status(403);
+				return res.json(responseUtil.getErrorResponseJsonObject(errorUtil.errorCodes.ERR_USER_LOGIN_FAIL,'Invalid login or password'));
+			}
+
+			let user = result.get();
+
+			authHelper.comparePassword(password, user.password, (err, isMatch) => {
+				if (isMatch && !err){
+					if (!result.get().token.startsWith('JWT')){
+						result.token = authHelper.getJwtToken({
+							id: result.id,
+							email: result.email,
+							password: result.password
+						});
+					}
+
+					result.save()
+						.then(result => {
+							res.status(200);
+							result.getFullInfo()
+								.then(content => {
+									return res.json(content);
+								})
+						})
+				}
+				else {
+					res.status(403);
+					return res.json(responseUtil.getErrorResponseJsonObject(errorUtil.errorCodes.ERR_USER_LOGIN_FAIL, 'Invalid login or Password'));			}
+			})
+		})
 	});
 
 

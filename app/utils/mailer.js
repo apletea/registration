@@ -4,8 +4,9 @@ let nodemailer = require('nodemailer');
 
 let config = {
 	email:{
+		service: 'gmail',
 		auth: {
-			user: '	regstration.confimr@gmail.com',
+			user: 'regstration.confimr@gmail.com',
 			pass: 'zxcvbnm,.'
 		}
 	}

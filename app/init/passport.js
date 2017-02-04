@@ -1,6 +1,6 @@
 'use strict';
 
-let Model = require('../model');
+let Model = require('../model'),
 	JwtStrategy = require('passport-jwt').Strategy,
 	ExtractJwt = require('passport-jwt').ExtractJwt;
 
@@ -10,7 +10,7 @@ module.exports = passport => {
 		secretOrKey: 'secretOrKey',
 		jwtFromRequest: ExtractJwt.fromAuthHeader()
 	};
-
+	console.log(options.jwtFromRequest);
 	passport.use(new JwtStrategy(options, (jwt_payload, done) => {
 			let query = {};
 			if (jwt_payload.email){

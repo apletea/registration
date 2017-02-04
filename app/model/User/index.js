@@ -9,7 +9,7 @@ let attributes = {
 		autoIncrement: true,
 		primaryKey: true,
 		type: Sequelize.BIGINT
-	}
+	},
 	email: {
 		type: Sequelize.STRING,
 		unique: true,
@@ -28,7 +28,17 @@ let attributes = {
 let options = {
 	hooks: hooks,
 	freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    instanceMethods: {
+    	getFullInfo: () =>{
+    		let self = this;
+
+    		let jsonResult = JSON.parse(JSON.stringify(self.get()));
+    		return new Promise((resolve,reject) => {
+    			resolve(jsonResult);
+    		})
+    	}
+    }
 };
 
 module.exports.attributes = attributes;
