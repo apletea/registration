@@ -30,7 +30,7 @@ let options = {
 	freezeTableName: true,
     timestamps: false,
     instanceMethods: {
-    	getFullInfo: () =>{
+    	getFullInfo: function() {
     		let self = this;
 
     		let jsonResult = JSON.parse(JSON.stringify(self.get()));

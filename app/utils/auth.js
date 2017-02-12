@@ -5,7 +5,7 @@ let bcrypt = require('bcrypt'),
 	request = require('request'),
 	md5 = require('md5'),
 	config = {auth: {
-		secretKey: 'superSecretKey'
+		secretOrKey: 'secretOrKey'
 	}};
 
 let comparePassword = (password, hash, cb) => {
@@ -32,7 +32,7 @@ let hashPassword = (pass, cb) => {
 };
 
 let getJwtToken = user => {
-	return `JWT ${jwt.encode(user, config.auth.secretKey)}`;
+	return `JWT ${jwt.encode(user, config.auth.secretOrKey)}`;
 };
 
 module.exports = {
